@@ -1,0 +1,1 @@
+import{h as a,c as e,w as t,a4 as o,o as s,a as n,u as r,a2 as c}from"./index-DDyB_HML.js";const f=a({__name:"BlankLayout",setup(u){return(p,_)=>(s(),e(o,null,{default:t(()=>[n(r(c))]),_:1}))}});export{f as default};
