@@ -14,18 +14,10 @@ const app = initializeApp({
 });
 
 const db = getFirestore(app);
-
-// for (const i of [...Array(10).keys()]) {
-//   db.collection("equipements").add({
-//     num_intervention: faker.number.bigInt({ min: 10n, max: 100n }),
-
-//   });
-// }
-
+db.settings({ ignoreUndefinedProperties: true });
 //DATA
-
-let nb_interventions = 10;
-let nb_gammes = 5;
+let nb_interventions = 100;
+let nb_gammes = 15;
 
 const db_installations = [
   {
@@ -202,7 +194,7 @@ let interventionIds = [];
 let gammeIds = [];
 
 //SUPPRESSION
-async function deleteAllDocuments(listeIds, collectionName) {
+async function deleteAllDocuments(collectionName) {
   const snapshot = await db.collection(collectionName).get(); // Récupérer tous les documents
   const batch = db.batch(); // Utilisation d'un batch pour optimiser
 
@@ -216,14 +208,13 @@ async function deleteAllDocuments(listeIds, collectionName) {
 
 //RECUPERATION IDs
 async function getAllIDs(collectionName) {
-  let listeIds = [];
+  let items = [];
   const snapshot = await db.collection(collectionName).get(); // Récupérer tous les documents
 
   snapshot.forEach((doc) => {
-    listeIds.push(doc.id); // Supprimer chaque document
+    items.push({ id: doc.id, ...doc.data() }); // Supprimer chaque document
   });
-  console.log(listeIds);
-  return listeIds;
+  return items;
 }
 
 //CREATION
@@ -253,27 +244,36 @@ async function generateInstallations() {
 
   console.log("Installations ajoutées avec succès !");
   console.log("IDs des documents créés :", installationIds);
-  getAllIDs(installationIds, "installations");
 }
 
 async function generateInterventions() {
   console.log("Interventions : ");
+  let installations_items = await getAllIDs("installations");
+  let gammes_items = await getAllIDs("gammes");
+
   for (let i = 0; i < nb_interventions; i++) {
     try {
+      let item = faker.helpers.arrayElement(installations_items);
+      let item_gamme = faker.helpers.arrayElement(gammes_items);
+      console.log("Item sélectionné :", item);
+      console.log("Item_Gamme sélectionné :", item_gamme);
       db.collection("interventions").add({
         num_intervention: faker.number.int({ min: 10000, max: 99999 }),
         titre: faker.hacker.phrase(),
         statut: faker.helpers.arrayElement(db_statut),
         date: faker.date.recent({ days: 30 }),
-        installation: db.doc(
-          `/installations/${faker.helpers.arrayElement(installationIds)}`
-        ),
+        installation: {
+          id: item.id,
+          reference: item.reference ?? "000",
+          code: item.code,
+          nom: item.nom,
+        },
         nature: faker.helpers.arrayElement(db_nature),
         priorite: faker.helpers.arrayElement(db_priorite),
         cause: faker.helpers.arrayElement(db_cause),
         details: faker.lorem.sentence(),
         temps_intervention: faker.number.int({ min: 10, max: 480 }),
-        gamme: db.doc(`/gammes/${faker.helpers.arrayElement(gammeIds)}`),
+        gamme: db.doc(`/gammes/${item_gamme.id}`),
       });
     } catch (error) {
       console.error(`❌ Erreur lors de l'ajout `, error);
@@ -283,23 +283,27 @@ async function generateInterventions() {
   }
 
   console.log("Interventions ajoutées avec succès !");
-  console.log("IDs des documents créés:", interventionIds);
 }
 
 async function generateGammes() {
   console.log("Gammes : ");
-  console.log(installationIds);
-  let installationIds = getAllIDs("installations");
+  let installations_items = await getAllIDs("installations");
+
   for (let i = 0; i < nb_gammes; i++) {
     try {
-      await db.collection("interventions").add({
+      let item = faker.helpers.arrayElement(installations_items);
+      console.log("Item sélectionné :", item);
+      await db.collection("gammes").add({
         num_gamme: faker.number.int({ min: 10000, max: 99999 }),
         titre: faker.hacker.phrase(),
         statut: faker.helpers.arrayElement(db_statut),
         date: faker.date.recent({ days: 30 }),
-        installation: db.doc(
-          `/installations/${faker.helpers.arrayElement(installationIds)}`
-        ),
+        installation: {
+          id: item.id,
+          reference: item.reference ?? "000",
+          code: item.code,
+          nom: item.nom,
+        },
         nature: faker.helpers.arrayElement(db_nature),
         priorite: faker.helpers.arrayElement(db_priorite),
         cause: faker.helpers.arrayElement(db_cause),
@@ -316,22 +320,25 @@ async function generateGammes() {
     }
   }
 
-  console.log("Interventions ajoutées avec succès !");
-  console.log("IDs des documents créés:", interventionIds);
-  getAllIDs(gammeIds, "gammes");
+  console.log("Gammes ajoutées avec succès !");
 }
 
+//GLOBAL
 function delete_all() {
   deleteAllDocuments("installations");
   deleteAllDocuments("interventions");
   deleteAllDocuments("gammes");
 }
 
-function create_all() {
-  generateInstallations();
-  //   generateGammes();
-  //   generateInterventions();
+async function create_all() {
+  await generateInstallations();
+  await generateGammes();
+  await generateInterventions();
 }
 
-getAllIDs(installationIds, "installations");
-generateGammes();
+function main() {
+  // delete_all();
+  create_all();
+}
+
+main();

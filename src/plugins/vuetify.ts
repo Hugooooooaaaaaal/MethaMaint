@@ -1,40 +1,42 @@
-import { createVuetify } from 'vuetify';
-import { aliases, mdi } from 'vuetify/iconsets/mdi-svg';
-import { icons } from './mdi-icon'; // Import icons from separate file
-import * as components from 'vuetify/components';
-import * as directives from 'vuetify/directives';
-import { PurpleTheme } from '@/theme/LightTheme';
+import { createVuetify } from "vuetify";
+import { aliases, mdi } from "vuetify/iconsets/mdi-svg";
+import { icons } from "./mdi-icon"; // Import icons from separate file
+import * as components from "vuetify/components";
+import * as directives from "vuetify/directives";
+import { PurpleTheme } from "@/theme/LightTheme";
+import { VTreeview } from "vuetify/labs/VTreeview";
 
 export default createVuetify({
   components,
+
   directives,
   icons: {
-    defaultSet: 'mdi',
+    defaultSet: "mdi",
     aliases: {
       ...aliases,
-      ...icons
+      ...icons,
     },
     sets: {
-      mdi
-    }
+      mdi,
+    },
   },
   theme: {
-    defaultTheme: 'PurpleTheme',
+    defaultTheme: "PurpleTheme",
     themes: {
-      PurpleTheme
-    }
+      PurpleTheme,
+    },
   },
   defaults: {
     VBtn: {},
     VCard: {
-      rounded: 'md'
+      rounded: "md",
     },
     VTextField: {
-      rounded: 'lg'
+      rounded: "lg",
     },
     VTooltip: {
       // set v-tooltip default location to top
-      location: 'top'
-    }
-  }
+      location: "top",
+    },
+  },
 });

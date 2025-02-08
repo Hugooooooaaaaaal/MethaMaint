@@ -68,6 +68,16 @@ GAMME : reference
 
 
 //Recherches Interventions
+INTERVENTION : ==
+TITRE : start_with
+STATUT : ==
+DATE_MIN : Date
+DATE_MAX : Date
+MACHINE : start_with
+NATURE : ==
+PRIORITE : ==
+CAUSE : ==
+
 
 
 onMounted(fetchArborescence);
