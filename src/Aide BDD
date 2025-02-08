@@ -1,0 +1,74 @@
+
+
+<script setup>
+import { ref, onMounted } from "vue";
+import { db } from "../firebase.config.js";
+import { collection, getDocs } from "firebase/firestore";
+
+
+
+//
+https://firebase.google.com/docs/firestore/manage-data/add-data?hl=fr
+
+//LIST
+const arborescence = ref([]);
+const fetchArborescence = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(db, "arborescence"));
+    arborescence.value = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  } catch (error) {
+    console.error("Erreur lors de la récupération des données :", error);
+  }
+};
+//OU
+const querySnapshot = await getDocs(collection(db, "arborescence"));
+    querySnapshot.forEach((doc) => {
+      console.log(doc.id, " => ", doc.data());
+    });
+
+//MODIFY
+// Set the "capital" field of the city 'DC'
+await updateDoc(doc(db, "COLLECTION", "ID"), {
+    nom: "los"
+  });
+
+OU
+await setDoc(doc(db, "COLLECTION", "ID"), {
+    nom: "Los sdfdsfd",
+});
+
+//ADD
+await addDoc(collection(db, "arborescence"), {
+    nom: "Los sdfdsfd",
+});
+
+// Add a new document with a generated id
+const newCityRef = doc(collection(db, "cities"));
+// later...
+await setDoc(newCityRef, data);
+
+
+//Recherche Complexe
+
+ID
+INTERVENTION : integer
+TITRE : string
+STATUT : string
+DATE : Date
+MACHINE : string
+NATURE : string
+PRIORITE : string
+CAUSE : string
+DETAILS : string
+TEMPS_INTERVENTION : integer
+GAMME : reference
+
+
+//Recherches Interventions
+
+
+onMounted(fetchArborescence);
+</script>
